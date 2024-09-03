@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Models\User;
+use Exception;
 
 class AuthController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -40,6 +42,30 @@ class AuthController extends Controller
         ]);
     }
 
+    public function register(RegisterRequest $request)
+    {
+        try {
+            $user = User::create($request->all());
+            if (!$user) {
+                throw new Exception("User not created!");
+            }
+
+            return response()->json(
+                [
+                    'error' => false,
+                    'user' => $user,
+                    'message' => 'Created!'
+                ],
+                201
+            );
+        } catch (Exception $error) {
+            return response()->json([
+                'error' => true,
+                'message' => $error->getMessage()
+            ]);
+        }
+    }
+
     /**
      * Get the authenticated User.
      *
@@ -58,7 +84,6 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-
         return response()->json(['message' => 'Successfully logged out']);
     }
 }
