@@ -256,6 +256,39 @@
                     }
                 ]
             }
+        },
+        "/api/validadeToken": {
+            "get": {
+                "tags": [
+                    "JWT Authentication"
+                ],
+                "summary": "Get a validation token",
+                "description": "This endpoints return a true or false validation token",
+                "operationId": "d941df0b9e1e478da12dd232eeb0b169",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string",
+                                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS9sb2dpbiIsImlhdCI6MTcyNTY0Nzc1MCwiZXhwIjoxNzI1NjUxMzUwLCJuYmYiOjE3MjU2NDc3NTAsImp0aSI6IlQzc29ObzZsN3djbWNwcEQiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.JcuIxiOdHNpmGpsHtyIcc2T6pIHySyC9Kb4UIVBZn-8"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Validation Token!"
+                    }
+                }
+            }
         }
     },
     "components": {

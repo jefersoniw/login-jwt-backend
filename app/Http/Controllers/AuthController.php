@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\ValidateTokenRequest;
 use App\Models\User;
 use Exception;
 
@@ -14,7 +15,7 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'validadeToken']]);
     }
 
     /**
@@ -188,5 +189,53 @@ class AuthController extends Controller
     {
         auth()->logout();
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    /**
+     * @OA\GET(
+     *  tags={"JWT Authentication"},
+     *  summary="Get a validation token",
+     *  description="This endpoints return a true or false validation token",
+     *  path="/api/validadeToken",
+     *  @OA\RequestBody(
+     *      @OA\MediaType(
+     *          mediaType="multipart/form-data",
+     *          @OA\Schema(
+     *              required={"token"},
+     *              @OA\Property(property="token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS9sb2dpbiIsImlhdCI6MTcyNTY0Nzc1MCwiZXhwIjoxNzI1NjUxMzUwLCJuYmYiOjE3MjU2NDc3NTAsImp0aSI6IlQzc29ObzZsN3djbWNwcEQiLCJzdWIiOiIxIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.JcuIxiOdHNpmGpsHtyIcc2T6pIHySyC9Kb4UIVBZn-8")
+     *          )
+     *      ),
+     *  ),
+     *  @OA\Response(
+     *    response=200,
+     *    description="Validation Token!"
+     *  )
+     * )
+     */
+    public function validadeToken(ValidateTokenRequest $request)
+    {
+        if (!auth()->user()) {
+            return response()->json([
+                'error' => true,
+                'msg' => 'Token expirado!'
+            ]);
+        }
+
+        $p = auth()->payload();
+        $p->get('sub');
+        $p['jti'];
+        $p('exp');
+
+        if ($p->toArray()['exp'] < strtotime(date('Y-m-d H:i:s'))) {
+            return response()->json([
+                'error' => true,
+                'msg' => 'Token expirado!'
+            ]);
+        }
+
+        return response()->json([
+            'error' => false,
+            'msg' => 'Token válido!'
+        ]);
     }
 }
